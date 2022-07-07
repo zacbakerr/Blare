@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+        <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
+        <script src='https://cdn.firebase.com/js/client/2.2.1/firebase.js'></script>
+        <script src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js'></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://unpkg.com/infinity-css-grid@1.0.3/grid.css">
+    </head>
+    <style type="text/css">
+        body {
+            background-color: #ffffff;
+        }
+
+        :root {
+        --gutter: 20px;
+        }
+
+        .app {
+        padding: var(--gutter) 0;
+        display: grid;
+        grid-gap: var(--gutter) 0;
+        grid-template-columns: var(--gutter) 1fr var(--gutter);
+        align-content: start;
+        }
+
+        .app > * {
+        grid-column: 2 / -2;
+        }
+
+        .app > .full {
+        grid-column: 1 / 0;
+        }
+
+        #animatedDiv {
+            margin-top: 200px;
+            background: #dc143c;
+            min-height: 350px;
+            min-width: 20%;
+            position: absolute;
+        }
+
+        .hs {
+        display: grid;
+        grid-gap: calc(var(--gutter) / 2);
+        grid-template-columns: 10px;
+        grid-template-rows: minmax(150px, 1fr);
+        grid-auto-flow: column;
+        grid-auto-columns: calc(70% - var(--gutter) * 9);
+
+        overflow-x: scroll;
+        scroll-snap-type: x proximity;
+        padding-bottom: calc(.75 * var(--gutter));
+        padding-top: calc(.75 * var(--gutter));
+        margin-bottom: calc(-.25 * var(--gutter));
+        }
+
+        .hs:before,
+        .hs:after {
+        content: '';
+        width: 10px;
+        }
+
+        ul {
+        list-style: none;
+        }
+
+        h1,
+        h2,
+        h3 {
+        margin: 0;
+        }
+
+        .hs > li,
+        .item {
+        height: 475px;
+        width: 475px;
+        scroll-snap-align: center;
+        padding: calc(var(--gutter) / 2 * 1.5);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: #fff;
+        outline: 3px solid #000;
+        border-radius: 8px;
+        }
+        
+        .no-scrollbar {
+        scrollbar-width: none;
+        }
+        
+        .no-scrollbar::-webkit-scrollbar {
+        display: none;
+        }
+
+        #signInForm {
+            width: 40%;
+            padding: 20px;
+            font-family: 'Space Mono', monospace;
+
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            box-shadow: 0px 0px 3px #000;
+            border: 2px solid #000;
+
+            margin: 0;
+            position: absolute;
+            top: 30%;
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
+            left: 50%;
+            -ms-transform: translateX(-50%);
+            transform: translateX(-50%);
+        }
+
+        #signInFormText {
+            text-align: center;
+            font-size: 30px;
+            font-weight: bold;
+            font-family: 'Space Mono', monospace;
+        }
+
+        #container {
+            height: 200px;
+            position: relative;
+        }
+    </style>
+    <body>
+        <center>
+            <nav class="navbar navbar-expand-lg" style="background-color: white; font-color: black; width: 70%;">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="#" style="color: black; font-family: 'Space Mono', monospace;">Blare</a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="profile.html" style="color: black; font-family: 'Space Mono', monospace;">Home</a>
+                        </li>
+                        <li class="nav-item">
+                        <a class="nav-link" href="profile.html" style="color: black; font-family: 'Space Mono', monospace;">Profile</a>
+                        </li>
+                    </ul>
+                    <ul class="my-2 my-lg-0" style="padding-right: 20px">
+                        <li class="nav-item">
+                            <a type="button" data-bs-toggle="modal" data-bs-target="#exampleModal" style="color: black; font-family: 'Space Mono', monospace; font-size: 35px;">+</a>
+                        </li>
+                    </ul>
+                    <form class="form-inline my-2 my-lg-0" id="signedOut">
+                        <a class="btn btn-outline-success my-2 my-sm-0" type="submit" href="signIn.html" style="color: black; font-family: 'Space Mono', monospace; border: 2px solid #000;">Log in</a>
+                        <a class="btn btn-outline-success my-2 my-sm-0" type="submit" href="signUp.html" style="color: black; font-family: 'Space Mono', monospace; border: 2px solid #000;">Sign up</a>
+                    </form>
+                    <form class="form-inline my-2 my-lg-0" id="signedIn">
+                        <input class="form-controlmy-2 my-sm-0" type="search" id="searchQuerey" placeholder="Search" aria-label="Search" style="color: black; font-family: 'Space Mono', monospace;">
+                        <button class="btn btn-outline-success my-2 my-sm-0" id="searchForUser" type="submit" style="color: black; font-family: 'Space Mono', monospace; border: 2px solid #000;">Search</button>
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit" id="signOutButton" style="color: black; font-family: 'Space Mono', monospace; border: 2px solid #000;">Sign out</button>
+                    </form>
+                    </div>
+                </div>
+            </nav>
+        </center>
+
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel" style="color: black; font-family: 'Space Mono', monospace;">Create a new block</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createBlockForm">
+                    <div class="form-group">
+                        <label for="blockPhoto" style="color: black; font-family: 'Space Mono', monospace;">Block content</label>
+                        <input type="file" class="form-control" id="blockPhoto" placeholder="Block name" style="color: black; font-family: 'Space Mono', monospace;">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="blockDescription" style="color: black; font-family: 'Space Mono', monospace;">Block caption</label>
+                        <input type="text" class="form-control" id="blockDescription" placeholder="Block description" style="color: black; font-family: 'Space Mono', monospace;">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <label for="blockName" style="color: black; font-family: 'Space Mono', monospace;">Tag friend</label>
+                        <input type="text" class="form-control" id="friendName" placeholder="Friend username" style="color: black; font-family: 'Space Mono', monospace;">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="postButton">Post</button>
+            </div>
+            </div>
+        </div>
+        </div>
+
+        <div style="padding-top: 40px"></div>
+        <div style="text-align: center;">
+            <div id="profileHeader" style="width:70%; display: inline-block; text-align:left;">
+                <button type="button" class="btn" id="unfriendButton" style="color: black; font-family: 'Space Mono', monospace; border: 2px solid #000; font-size: 12px; width: 168px">Unfriend</button>
+                <h1 id="profileName" style="font-family: 'Space Mono', monospace; font-weight: 700"></h1>
+                    <h3 class="" id="profileUsername" style="font-family: 'Space Mono', monospace; font-weight: 700; padding-bottom: 10px"></h3>
+                    <button type="button" class="btn" id="friendButton" style="color: black; font-family: 'Space Mono', monospace; border: 2px solid #000; font-size: 12px; width: 168px">Send friend request</button>
+            </div>
+        </div>
+        <center>
+        </div>
+        <ul class="nav nav-tabs justify-content-center" style="width: 70%;">
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="#" id="blocksText" style="color: black; font-family: 'Space Mono', monospace;">Blocks</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" id="friendsText" style="color: black; font-family: 'Space Mono', monospace;">Friends</a>
+            </li>
+        </ul>
+        <div>
+            <div style="width: 70%;">
+            <ul class="hs full no-scrollbar" id="posts">
+                <li class="item">test</li>
+                <li class="item">test</li>
+                <li class="item">test</li>
+            </ul>
+            </div>
+        </div>
+        <div id="friends">
+            
+        </div>
+        </center>
+        <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+            <strong class="me-auto">Bootstrap</strong>
+            <small>11 mins ago</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+            Hello, world! This is a toast message.
+            </div>
+        </div>
+        </div>
+    <script type="module">
+        document.getElementById("signedOut").style.display = "none";
+        document.getElementById("friends").style.display = "none";
+        document.getElementById("unfriendButton").style.display = "none";
+        function handleForm(event) { event.preventDefault(); } 
+        var form = document.getElementById("signedOut");
+        form.addEventListener('submit', handleForm);
+        var form = document.getElementById("signedIn");
+        form.addEventListener('submit', handleForm);
+
+        var counter = 9;
+        document.addEventListener('scroll', function(e) {
+        if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {
+            var span = document.createElement('span');
+            span.innerHTML = ++counter;
+            document.body.appendChild(span);
+        }
+        })
+
+        var aDiv = document.getElementById("animatedDiv");
+
+        function changeWidth() 
+        {
+            var scrollVal = window.pageYOffset;
+            var scrollSlow  = (scrollVal / 4);
+            
+            //Changing CSS Width
+            aDiv.style.width = Math.min(Math.max(scrollSlow, 20), 100) + "%";
+        }
+
+        window.addEventListener('scroll', function() 
+        {
+            requestAnimationFrame(changeWidth);
+        }, false);
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-auth.js";
+        import { getDatabase, ref, set, onValue, orderByChild, query, orderByValue, remove, update } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-database.js";
+        import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.4.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAMx5mrVNnjG9SWePtWE4BoJKzydZb8K0Q",
+            authDomain: "squares-9c376.firebaseapp.com",
+            projectId: "squares-9c376",
+            storageBucket: "squares-9c376.appspot.com",
+            messagingSenderId: "927468153452",
+            appId: "1:927468153452:web:dc7a1a2a29e21b4c708649",
+            databaseURL: "https://squares-9c376-default-rtdb.firebaseio.com/",
+            storageBucket: "squares-9c376.appspot.com",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase();
+        const storage = getStorage(app);
+
+        const auth = getAuth(app);
+        const authh = getAuth();
+
+        function writeUserData(userId, username, email, password, fullName) {
+            set(ref(database, 'users/' + userId), {
+                username: username,
+                email: email,
+                password: password,
+                fullName: fullName
+            });
+        }
+
+        function swap(swap1, swap2) {
+            var x = document.getElementById(swap1);
+            if (x.style.display === "none") {
+                x.style.display = "block";
+                document.getElementById(swap2).style.display = "none";
+            } else {
+                x.style.display = "none";
+                document.getElementById(swap2).style.display = "block";
+            }
+        }
+
+        const signOutButton = () => {
+            signOut(auth).then(() => {
+                window.location.href = "signIn.html";
+            }).catch((error) => {
+                console.log(error)
+            });
+        }
+
+        function searchForUser() {
+            var search = document.getElementById("searchQuerey").value;
+            const readRef = ref(database, 'users');
+                onValue(readRef, (data) => {
+                    for (var key in data.val()) {
+                        if (data.val()[key].username === search) {
+                            var userId = key;
+                            var username = data.val()[key].username;
+                            var email = data.val()[key].email;
+                            var password = data.val()[key].password;
+                            var fullName = data.val()[key].fullName;
+                            window.location.href = "profile.html?userId=" + userId + "&username=" + username + "&email=" + email + "&fullName=" + fullName;
+                        }
+                    }
+                });
+        }
+
+        document.getElementById("searchForUser").addEventListener("click", searchForUser);
+
+        function stringToHash(string) {
+                
+            var hash = 0;
+                
+            if (string.length == 0) return hash;
+                
+            for (let i = 0; i < string.length; i++) {
+                let char = string.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+                
+            return hash;
+        }
+
+        document.getElementById("signOutButton").addEventListener("click", signOutButton)
+        document.getElementById("friendsText").addEventListener("click", function() {
+            if (document.getElementById("friends").style.display == "none") {
+                swap("friends", "posts");
+            }
+        })
+        document.getElementById("blocksText").addEventListener("click", function() {
+            if (document.getElementById("posts").style.display == "none") {
+                swap("posts", "friends");
+            }
+        });
+        document.getElementById("postButton").addEventListener("click", function() {
+            var blockContent = document.getElementById("blockPhoto").files[0];
+            var blockDescription = document.getElementById("blockDescription").value;
+            var friendUsername = document.getElementById("friendName").value;
+            var time = Date.now();
+
+            const readRef = ref(database, 'users');
+            onValue(readRef, (data) => {
+                for (var key in data.val()) {
+                    if (data.val()[key].username === friendUsername) {
+                        var friendId = key;
+                        var inFriends = false;
+                        for (var currFriend in data.val()[key].friends){
+                            console.log(auth.currentUser.uid);
+                            if (currFriend === auth.currentUser.uid){
+                                inFriends = true;
+                            }
+                        }
+                        if (inFriends == false) {
+                            alert("You are not friends with this user");
+                            var toastElList = [].slice.call(document.querySelectorAll('.toast'))
+                            var toastList = toastElList.map(function(toastEl) {
+                                return new bootstrap.Toast(toastEl)
+                            })
+                            toastList.forEach(toast => toast.show()) 
+                            return;
+                        }
+                        var storageRef = sRef(storage, 'posts/' + friendId + '/' + (time));
+                        uploadBytes(storageRef, blockContent.slice(0, blockContent.size, 'image/jpeg')).then(() => {
+                            console.log("Uploaded");
+                        }).then(() => {
+                            getDownloadURL(sRef(storage, 'gs://squares-9c376.appspot.com/posts/' + friendId + '/' + (time))).then((url) => {
+                                console.log(url);
+                                // get username
+                                var username = "";
+                                var readRef = ref(database, 'users');
+                                onValue(readRef, (data) => {
+                                    for (var key in data.val()) {
+                                        if (key === auth.currentUser.uid) {
+                                            username = data.val()[key].username;
+                                            set(ref(database, 'posts/' + friendId + '/' + (time) ), {
+                                                blockDescription: blockDescription,
+                                                blockUser: friendId,
+                                                blockUsername: username,
+                                                timestamp: time,
+                                                url: url
+                                            }).catch((error) => {
+                                                console.log(error);
+                                            });
+                                        }
+                                    }
+                                })
+                            });
+                        }).catch((error) => {
+                            console.log(error)
+                        });
+                    }
+                }
+            });
+        });
+
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const userId = urlParams.get('userId');
+        const username = urlParams.get('username');
+        const email = urlParams.get('email');
+        const fullName = urlParams.get('fullName');
+
+        document.getElementById("profileName").innerHTML = fullName;
+        document.getElementById("profileUsername").innerHTML = "@" + username;
+        listFriends(userId);
+        listBlocks(userId);
+
+        auth.onAuthStateChanged(function(user) {
+            if (user && user.uid === userId) {
+                console.log("user is logged in");
+                const userId = user.uid;
+                const readRef = ref(database, 'users/' + userId);
+                onValue(readRef, (data) => {
+                    console.log(data.val().username + userId);
+                });
+                document.getElementById("friendButton").style.display = "none";
+            } else if (user && user.uid !== userId) {
+                console.log("user is logged in");
+                const userIdd = user.uid;
+                const readRef = ref(database, 'users/' + userIdd);
+                onValue(readRef, (data) => {
+                    console.log(data.val().username + userIdd);
+                });
+                var readReff = ref(database, 'users/' + auth.currentUser.uid);
+                onValue(readReff, (data) => {
+                    var friends = data.val().friends;
+                    for (var key in friends) {
+                        console.log(friends[key].friendId);
+                        if (friends[key].friendId == userId) {
+                            swap("friendButton", "unfriendButton");
+                            return;
+                        }
+                    }
+                });
+            } else {
+                swap("signedOut", "signedIn");
+            }
+        });
+
+
+
+        document.getElementById("friendButton").addEventListener("click", function() {
+            var currUserID = auth.currentUser.uid;
+            var friendId = userId;
+
+            var readRef = ref(database, 'users/' + currUserID);
+            onValue(readRef, (data) => {
+                var friends = data.val().friends;
+                for (var key in friends) {
+                    if (friends[key].friendId == friendId) {
+                        alert("You are already friends with this user");
+                        swap("friendButton", "unfriendButton");
+                        return;
+                    }
+                }
+                set(ref(database, 'users/' + currUserID + '/friends/' + friendId), {
+                    friendId: friendId
+                }).then(() => {
+                    set(ref(database, 'users/' + friendId + '/friends/' + currUserID), {
+                        friendId: currUserID
+                    }).then(() => {
+                        // alert("You are now friends with " + username);
+                        swap("friendButton", "unfriendButton");
+                    }).catch((error) => {
+                        console.log(error);
+                    });
+                }).catch((error) => {
+                    console.log(error);
+                });
+            });
+        });
+
+        document.getElementById("unfriendButton").addEventListener("click", function() {
+            var currUserID = auth.currentUser.uid;
+            var friendId = userId;
+
+            var readRef = ref(database, 'users/' + currUserID);
+            onValue(readRef, (data) => {
+                var friends = data.val().friends;
+                var inFriends = false;
+                for (var key in friends) {
+                    if (friends[key].friendId == friendId) {
+                        inFriends = true;
+                    }
+                }
+                if (inFriends == false) {
+                    alert("You are not friends with this user");
+                    return;
+                } else {
+                    // remove friend from database
+                    remove(ref(database, 'users/' + currUserID + '/friends/' + friendId)).then(() => {
+                        remove(ref(database, 'users/' + friendId + '/friends/' + currUserID)).then(() => {
+                            // alert("You are no longer friends with " + username);
+                            swap("friendButton", "unfriendButton");
+                        }).catch((error) => {
+                            console.log(error);
+                        });
+                    }).catch((error) => {
+                        console.log(error);
+                    });
+                }
+            });
+        });
+                
+
+        function listFriends(userId) {
+            var currUserID = userId;
+            var readRef = ref(database, 'users/' + currUserID);
+            onValue(readRef, (data) => {
+                var friends = data.val().friends;
+                var friendList = document.getElementById("friends");
+                friendList.innerHTML = "";
+                for (var key in friends) {
+                    var friendId = friends[key].friendId;
+                    var readRef = ref(database, 'users/' + friendId);
+                    onValue(readRef, (data) => {
+                        var friendUsername = data.val().username;
+                        var friendFullName = data.val().fullName;
+                        var friendEmail = data.val().email;
+                        var friend = document.createElement("div");
+                        friendList.appendChild(friend);
+                        friend.innerHTML = "<a href='profile.html?userId=" + friendId + "&username=" + friendUsername + "&email=" + friendEmail + "&fullName=" + friendFullName + "' style='color: black; font-family: Space Mono, monospace;'>" + friendFullName + "</a>";
+                    });
+                }
+            });
+        }
+
+        function sleep(milliseconds) {
+            const date = Date.now();
+            let currentDate = null;
+            do {
+                currentDate = Date.now();
+            } while (currentDate - date < milliseconds);
+        }
+        
+        function countProps(obj) {
+            var count = 0;
+            for (var p in obj) {
+            obj.hasOwnProperty(p) && count++;
+            }
+            return count; 
+        }
+
+        async function listBlocks(userId) {
+            var currUserID = userId;
+            var readRef = ref(database, 'posts/' + currUserID);
+            var descriptions = new Array();
+            var urls = [];
+            var userNames = [];
+            await onValue(readRef, (data) => {
+                var blocks = data.val();
+                for (var key in blocks) {
+                    var blockDescription = blocks[key].blockDescription;
+                    var blockUser = blocks[key].blockUsername;
+                    var blockTimestamp = blocks[key].timestamp;
+                    var blockUrl = blocks[key].url;
+                    var blockUserr = blocks[key].blockUser;
+                    (descriptions.push(blockDescription));
+                    urls.push(blockUrl);
+                    var readRef = ref(database, 'users/' + blockUserr);
+                    var blockUsername = "";
+                    onValue(readRef, (data) => {
+                        blockUsername = data.val().username;
+                        userNames.push(blockUsername);
+
+                    })
+                }
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            var blockList = document.getElementById("posts");
+            blockList.innerHTML = "";
+            for (var i = 0; i < descriptions.length; i++) {
+                var block = document.createElement("li");
+                blockList.appendChild(block);
+                block.innerHTML = "<img src='" + urls[i] + "' style='width: 475px; height: 400px;'><p style='color: black; font-family: Space Mono, monospace;'" +  "</p>"  + descriptions[i] + "<br>Posted by: " + userNames[i];
+            }
+        }
+
+    </script>
+    </body>
+</html>
